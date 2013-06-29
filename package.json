@@ -1,0 +1,25 @@
+{
+	"author": "Félix Girault",
+	"name": "multiplayer",
+	"description": "Exposes different player APIs in a unified interface.",
+	"version": "0.0.1",
+	"homepage": "http://github.com/felixgirault/multiplayer.js",
+	"repository": {
+		"type": "git",
+		"url": "http://github.com/felixgirault/multiplayer.js"
+	},
+	"engines": {
+		"node": "~0.6.10 || 0.8 || 0.9"
+	},
+	"scripts": {
+		"start": "brunch watch --server",
+		"test": "brunch test"
+	},
+	"dependencies": {
+		"javascript-brunch": ">= 1.0 < 1.6",
+		"css-brunch": ">= 1.0 < 1.6",
+		"uglify-js-brunch": ">= 1.0 < 1.6",
+		"clean-css-brunch": ">= 1.0 < 1.6"
+	},
+	"devDependencies": { }
+}
