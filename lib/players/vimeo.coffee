@@ -22,7 +22,6 @@ class Vimeo extends Player
 			'src',
 			"http://player.vimeo.com/video/#{@id}?api=1&player_id=#{@domId}"
 		)
-		console.log(	"http://player.vimeo.com/video/#{@id}?api=1&player_id=#{@domId}")
 		el.setAttribute( 'webkitAllowFullScreen', 'webkitAllowFullScreen' )
 		el.setAttribute( 'mozallowfullscreen', 'mozallowfullscreen' )
 		el.setAttribute( 'allowFullScreen', 'allowFullScreen' )
@@ -38,7 +37,6 @@ class Vimeo extends Player
 
 		setTimeout(( ) =>
 			@player = Froogaloop( el ).addEvent( 'ready', ( ) =>
-				console.log('ready')
 				@vol = this.volume( )
 				@dfd.resolve( this )
 			)

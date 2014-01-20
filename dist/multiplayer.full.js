@@ -3133,7 +3133,6 @@ Vimeo = (function(_super) {
     el = document.createElement('iframe');
     el.setAttribute('id', this.domId);
     el.setAttribute('src', "http://player.vimeo.com/video/" + this.id + "?api=1&player_id=" + this.domId);
-    console.log("http://player.vimeo.com/video/" + this.id + "?api=1&player_id=" + this.domId);
     el.setAttribute('webkitAllowFullScreen', 'webkitAllowFullScreen');
     el.setAttribute('mozallowfullscreen', 'mozallowfullscreen');
     el.setAttribute('allowFullScreen', 'allowFullScreen');
@@ -3150,7 +3149,6 @@ Vimeo = (function(_super) {
     }
     setTimeout(function() {
       return _this.player = Froogaloop(el).addEvent('ready', function() {
-        console.log('ready');
         _this.vol = _this.volume();
         return _this.dfd.resolve(_this);
       });
