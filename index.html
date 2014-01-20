@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Multiplayer.js</title>
+		<script src="dist/multiplayer.full.js"></script>
+	</head>
+
+	<body>
+		<article>
+			<header>
+				<h1>Simple Youtube example</h1>
+				<p>Plays the video when the player is loaded</p>
+			</header>
+
+			<div id="first-example"></div>
+			<pre class="code"></pre>
+
+			<script class="source">
+				var multiplayer = require( 'multiplayer' );
+
+				multiplayer( 'http://www.youtube.com/watch?v=gus0b8Z-Ez8', {
+					id: 'first-example',
+					width: 800,
+					height: 600
+				}).then( function( player ) {
+					player.play( );
+				}, function( error ) {
+					alert( error );
+				});
+			</script>
+		</article>
+
+		<script>
+			var sources = document.getElementsByClassName( 'source' );
+			var source;
+
+			for ( var i in sources ) {
+				source = sources[ i ];
+				source.previousElementSibling.innerHTML = source.innerHTML;
+			}
+		</script>
+	</body>
+</html>

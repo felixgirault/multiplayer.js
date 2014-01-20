@@ -1,25 +1,20 @@
 {
-	"author": "Félix Girault",
-	"name": "multiplayer",
-	"description": "Exposes different player APIs in a unified interface.",
-	"version": "0.0.1",
-	"homepage": "http://github.com/felixgirault/multiplayer.js",
-	"repository": {
-		"type": "git",
-		"url": "http://github.com/felixgirault/multiplayer.js"
-	},
-	"engines": {
-		"node": "~0.6.10 || 0.8 || 0.9"
-	},
-	"scripts": {
-		"start": "brunch watch --server",
-		"test": "brunch test"
-	},
-	"dependencies": {
-		"javascript-brunch": ">= 1.0 < 1.6",
-		"css-brunch": ">= 1.0 < 1.6",
-		"uglify-js-brunch": ">= 1.0 < 1.6",
-		"clean-css-brunch": ">= 1.0 < 1.6"
-	},
-	"devDependencies": { }
+  "author": "Félix Girault",
+  "name": "multiplayer",
+  "description": "Exposes different player APIs in a unified interface.",
+  "version": "0.1.0",
+  "homepage": "http://github.com/felixgirault/multiplayer.js",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/felixgirault/multiplayer.js"
+  },
+  "devDependencies": {
+    "gulp": "latest",
+    "gulp-util": "latest",
+    "gulp-coffee": "latest",
+    "gulp-wrap-define": "latest",
+    "gulp-concat": "latest",
+    "gulp-uglify": "latest",
+    "gulp-rename": "latest"
+  }
 }
