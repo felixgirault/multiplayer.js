@@ -16,19 +16,24 @@ class Dailymotion extends Player
 
 
 
+	_queue = { }
+
 	constructor: ( id, options ) ->
 		super( id, options )
 
-		@player = document.createElement( 'div' )
-		@player.setAttribute( 'id', @domId )
-		@container.appendChild( @player )
+		player = document.createElement( 'div' )
+		player.setAttribute( 'id', @domId )
+		@container.appendChild( player )
 
 		if !window.onDailymotionPlayerReady
-			window._dmdfd = [ ]
 			window.onDailymotionPlayerReady = ( id ) ->
-				dfd.resolve( ) for domId, dfd of window._dmdfd when id is domId
+				for domId, callback of _queue
+					if id is domId
+						callback( domId )
+						delete _queue[ domId ]
 
-		window._dmdfd[ @domId ]  = ( ) =>
+		_queue[ @domId ] = ( id ) =>
+			@player = document.getElementById( id )
 			@dfd.resolve( this )
 
 		swfobject.embedSWF(

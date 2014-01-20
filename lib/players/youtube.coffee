@@ -10,12 +10,17 @@ Util = require( 'util' )
 
 class Youtube extends Player
 
+	API: 'https://www.youtube.com/iframe_api'
+
 	UNSTARTED: -1
 	ENDED: 0
 	PLAYING: 1
 	PAUSED: 2
 
 
+
+	_loaded = false
+	_queue = [ ]
 
 	constructor: ( id, options ) ->
 		super( id, options )
@@ -25,30 +30,24 @@ class Youtube extends Player
 		@container.appendChild( player )
 
 		if !window.onYouTubeIframeAPIReady
-			Util.loadScript( 'https://www.youtube.com/iframe_api' )
-
-			window._youtubeLoaded = false
-			window._youtubeQueue = [ ]
-
 			window.onYouTubeIframeAPIReady = ( id ) ->
-				window._youtubeLoaded = true
-				callback( ) for callback in window._youtubeQueue
+				callback( ) for callback in _queue
+				_loaded = true
 
-		setup = ( event ) =>
-			new YT.Player( @domId, {
+			Util.load( @API )
+
+		setup = ( ) =>
+			new YT.Player( @domId,
 				height: '390',
 				width: '640',
 				videoId: @id,
-				events: {
+				events:
 					onReady: ( event ) =>
 						@player = event.target
 						@dfd.resolve( this )
-				}
-			});
+			)
 
-		if window._youtubeLoaded
-		then setup( )
-		else window._youtubeQueue.push( setup )
+		if _loaded then setup( ) else _queue.push( setup )
 
 
 

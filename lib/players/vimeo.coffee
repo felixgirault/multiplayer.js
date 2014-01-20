@@ -4,14 +4,19 @@
 #
 
 Player = require( 'player' )
+Util = require( 'util' )
 
 
 
 class Vimeo extends Player
 
-	@_froogaloopLoaded = false
+	API: 'http://a.vimeocdn.com/js/froogaloop2.min.js'
 
 
+
+	_loaded = false
+	_loading = false
+	_queue = [ ]
 
 	constructor: ( id, options ) ->
 		super( id, options )
@@ -31,16 +36,21 @@ class Vimeo extends Player
 
 		@container.appendChild( el )
 
-		if !@_froogaloopLoaded
-			Util.loadScript( 'http://a.vimeocdn.com/js/froogaloop2.min.js' )
-			@_froogaloopLoaded = true
+		if !_loading
+			_loading = true
+			Util.load( @API ).then(( ) ->
+				callback( ) for callback in _queue
+				_loaded = true
+			)
 
-		setTimeout(( ) =>
-			@player = Froogaloop( el ).addEvent( 'ready', ( ) =>
+		setup = ( ) =>
+			@player = Froogaloop( el )
+			@player.addEvent( 'ready', ( ) =>
 				@vol = this.volume( )
 				@dfd.resolve( this )
 			)
-		)
+
+		if _loaded then setup( ) else _queue.push( setup )
 
 
 
