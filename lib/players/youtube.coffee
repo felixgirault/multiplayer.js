@@ -73,6 +73,7 @@ class Youtube extends Player
 
 	stop: ( ) ->
 		@player.stopVideo( )
+		@player.seek( 0 )
 
 	isStopped: ( ) ->
 		@player.getPlayerState( ) in [ @UNSTARTED, @ENDED ]
