@@ -2909,7 +2909,7 @@ multiplayer = function(url, options) {
       return player.ready();
     }
   }
-  return Q.defer().reject("No suitable player found").promise;
+  return Q.defer().reject('No suitable player found').promise;
 };
 
 module.exports = multiplayer;
@@ -2978,12 +2978,26 @@ var Util;
 Util = (function() {
   function Util() {}
 
-  Util.loadScript = function(url) {
-    var firstScript, script;
+  Util.load = function(url) {
+    var dfd, done, head, script;
+    dfd = Q.defer();
+    head = document.getElementsByTagName('head')[0] || document.documentElement;
     script = document.createElement('script');
-    script.setAttribute('src', url);
-    firstScript = document.getElementsByTagName('script')[0];
-    return firstScript.parentNode.insertBefore(script, firstScript);
+    script.src = url;
+    done = false;
+    script.onload = script.onreadystatechange = function() {
+      var _ref;
+      if (!done && (!this.readyState || ((_ref = this.readyState) === 'loaded' || _ref === 'complete'))) {
+        script.onload = script.onreadystatechange = null;
+        done = true;
+        if (head && script.parentNode) {
+          head.removeChild(script);
+        }
+        return dfd.resolve();
+      }
+    };
+    head.insertBefore(script, head.firstChild);
+    return dfd.promise;
   };
 
   return Util;
@@ -3001,6 +3015,8 @@ var Dailymotion, Player,
 Player = require('player');
 
 Dailymotion = (function(_super) {
+  var _queue;
+
   __extends(Dailymotion, _super);
 
   Dailymotion.prototype.UNSTARTED = -1;
@@ -3011,28 +3027,33 @@ Dailymotion = (function(_super) {
 
   Dailymotion.prototype.PAUSED = 2;
 
+  _queue = {};
+
   function Dailymotion(id, options) {
-    var _this = this;
+    var player,
+      _this = this;
     Dailymotion.__super__.constructor.call(this, id, options);
-    this.player = document.createElement('div');
-    this.player.setAttribute('id', this.domId);
-    this.container.appendChild(this.player);
+    player = document.createElement('div');
+    player.setAttribute('id', this.domId);
+    this.container.appendChild(player);
     if (!window.onDailymotionPlayerReady) {
-      window._dmdfd = [];
       window.onDailymotionPlayerReady = function(id) {
-        var dfd, domId, _ref, _results;
-        _ref = window._dmdfd;
+        var callback, domId, _results;
         _results = [];
-        for (domId in _ref) {
-          dfd = _ref[domId];
+        for (domId in _queue) {
+          callback = _queue[domId];
           if (id === domId) {
-            _results.push(dfd.resolve());
+            callback(domId);
+            _results.push(delete _queue[domId]);
+          } else {
+            _results.push(void 0);
           }
         }
         return _results;
       };
     }
-    window._dmdfd[this.domId] = function() {
+    _queue[this.domId] = function(id) {
+      _this.player = document.getElementById(id);
       return _this.dfd.resolve(_this);
     };
     swfobject.embedSWF("http://www.dailymotion.com/swf/" + this.id + "?enableApi=1&playerapiid=" + this.domId, this.domId, options.width, options.height, options.version, options.swfUrl, options.flashVars, options.params, options.attributes);
@@ -3115,19 +3136,29 @@ module.exports = Dailymotion;
 
 });
 require.register('players/vimeo', function(exports, require, module) {
-var Player, Vimeo,
+var Player, Util, Vimeo,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 Player = require('player');
 
+Util = require('util');
+
 Vimeo = (function(_super) {
+  var _loaded, _loading, _queue;
+
   __extends(Vimeo, _super);
 
-  Vimeo._froogaloopLoaded = false;
+  Vimeo.prototype.API = 'http://a.vimeocdn.com/js/froogaloop2.min.js';
+
+  _loaded = false;
+
+  _loading = false;
+
+  _queue = [];
 
   function Vimeo(id, options) {
-    var el,
+    var el, setup,
       _this = this;
     Vimeo.__super__.constructor.call(this, id, options);
     el = document.createElement('iframe');
@@ -3143,16 +3174,29 @@ Vimeo = (function(_super) {
       el.setAttribute('height', options.height);
     }
     this.container.appendChild(el);
-    if (!this._froogaloopLoaded) {
-      Util.loadScript('http://a.vimeocdn.com/js/froogaloop2.min.js');
-      this._froogaloopLoaded = true;
+    if (!_loading) {
+      _loading = true;
+      Util.load(this.API).then(function() {
+        var callback, _i, _len;
+        for (_i = 0, _len = _queue.length; _i < _len; _i++) {
+          callback = _queue[_i];
+          callback();
+        }
+        return _loaded = true;
+      });
     }
-    setTimeout(function() {
-      return _this.player = Froogaloop(el).addEvent('ready', function() {
+    setup = function() {
+      _this.player = Froogaloop(el);
+      return _this.player.addEvent('ready', function() {
         _this.vol = _this.volume();
         return _this.dfd.resolve(_this);
       });
-    });
+    };
+    if (_loaded) {
+      setup();
+    } else {
+      _queue.push(setup);
+    }
   }
 
   Vimeo.prototype.load = function() {};
@@ -3199,7 +3243,7 @@ Vimeo = (function(_super) {
   };
 
   Vimeo.prototype.volume = function() {
-    return this.player.api('getVolume');
+    return this.player.api('getVolume') * 100;
   };
 
   Vimeo.prototype.setVolume = function(volume) {
@@ -3240,7 +3284,11 @@ Player = require('player');
 Util = require('util');
 
 Youtube = (function(_super) {
+  var _loaded, _queue;
+
   __extends(Youtube, _super);
+
+  Youtube.prototype.API = 'https://www.youtube.com/iframe_api';
 
   Youtube.prototype.UNSTARTED = -1;
 
@@ -3250,6 +3298,10 @@ Youtube = (function(_super) {
 
   Youtube.prototype.PAUSED = 2;
 
+  _loaded = false;
+
+  _queue = [];
+
   function Youtube(id, options) {
     var player, setup,
       _this = this;
@@ -3258,22 +3310,17 @@ Youtube = (function(_super) {
     player.setAttribute('id', this.domId);
     this.container.appendChild(player);
     if (!window.onYouTubeIframeAPIReady) {
-      Util.loadScript('https://www.youtube.com/iframe_api');
-      window._youtubeLoaded = false;
-      window._youtubeQueue = [];
       window.onYouTubeIframeAPIReady = function(id) {
-        var callback, _i, _len, _ref, _results;
-        window._youtubeLoaded = true;
-        _ref = window._youtubeQueue;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          callback = _ref[_i];
-          _results.push(callback());
+        var callback, _i, _len;
+        for (_i = 0, _len = _queue.length; _i < _len; _i++) {
+          callback = _queue[_i];
+          callback();
         }
-        return _results;
+        return _loaded = true;
       };
+      Util.load(this.API);
     }
-    setup = function(event) {
+    setup = function() {
       return new YT.Player(_this.domId, {
         height: '390',
         width: '640',
@@ -3286,10 +3333,10 @@ Youtube = (function(_super) {
         }
       });
     };
-    if (window._youtubeLoaded) {
+    if (_loaded) {
       setup();
     } else {
-      window._youtubeQueue.push(setup);
+      _queue.push(setup);
     }
   }
 
@@ -3318,7 +3365,8 @@ Youtube = (function(_super) {
   };
 
   Youtube.prototype.stop = function() {
-    return this.player.stopVideo();
+    this.player.stopVideo();
+    return this.player.seek(0);
   };
 
   Youtube.prototype.isStopped = function() {
