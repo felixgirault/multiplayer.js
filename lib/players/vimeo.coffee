@@ -94,7 +94,7 @@ class Vimeo extends Player
 
 
 	volume: ( ) ->
-		@player.api( 'getVolume' )
+		@player.api( 'getVolume' ) * 100
 
 	setVolume: ( volume ) ->
 		@vol = volume / 100
