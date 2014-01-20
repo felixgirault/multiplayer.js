@@ -36,7 +36,7 @@ multiplayer = ( url, options ) ->
 			player = new module( matches[ 1 ], options )
 			return player.ready( )
 
-	return Q.defer( ).reject( "No suitable player found" ).promise
+	return Q.defer( ).reject( 'No suitable player found' ).promise
 
 
 
