@@ -7,23 +7,26 @@
 		<script src="dist/multiplayer.full.js"></script>
 
 		<style>
-			.players:before,
-			.players:after {
-				content: " ";
-				display: table;
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				text-align: center;
 			}
 
-			.players:after {
-				clear: both;
+			h1 {
+				margin: 1em 0;
+				font-size: 4em;
 			}
 
 			.players {
-				*zoom: 1;
+				background: #000;
 			}
 
 			.player-wrapper {
-				float: left;
-				width: 33%;
+				display: inline-block;
+				margin: 1%;
+				width: 30%;
 			}
 
 			.player {
@@ -48,10 +51,22 @@
 				background: #000;
 				z-index: 100;
 			}
+
+			.controls {
+				margin: 4em 0;
+			}
+
+			button {
+				padding: 0.5em;
+				font-size: 2em;
+				line-height: 1em;
+			}
 		</style>
 	</head>
 
 	<body>
+		<h1>Multiplayer.js</h1>
+
 		<div class="players">
 			<div class="player-wrapper">
 				<div class="player">
@@ -95,8 +110,8 @@
 				});
 			}
 
-			create( 'dailymotion', 'http://www.dailymotion.com/video/x19yhlp_le-joueur-le-plus-malchanceux-de-gta-v-online_videogames' );
-			create( 'vimeo', 'http://vimeo.com/68787849' );
+			create( 'dailymotion', 'http://www.dailymotion.com/video/xx5d4c_paperman_shortfilms' );
+			create( 'vimeo', 'http://vimeo.com/38591304' );
 			create( 'youtube', 'http://www.youtube.com/watch?v=gus0b8Z-Ez8' );
 
 			var buttons = document.getElementsByTagName( 'button' );
