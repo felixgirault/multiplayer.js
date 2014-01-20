@@ -5,40 +5,108 @@
 		<meta charset="utf-8" />
 		<title>Multiplayer.js</title>
 		<script src="dist/multiplayer.full.js"></script>
+
+		<style>
+			.players:before,
+			.players:after {
+				content: " ";
+				display: table;
+			}
+
+			.players:after {
+				clear: both;
+			}
+
+			.players {
+				*zoom: 1;
+			}
+
+			.player-wrapper {
+				float: left;
+				width: 33%;
+			}
+
+			.player {
+				position: relative;
+				height: 0;
+				padding-bottom: 56%;
+				overflow: hidden;
+				background: #000;
+			}
+
+			.player video,
+			.player iframe,
+			.player object,
+			.player embed {
+				margin: 0;
+				padding: 0;
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: #000;
+				z-index: 100;
+			}
+		</style>
 	</head>
 
 	<body>
-		<article>
-			<header>
-				<h1>Simple Youtube example</h1>
-				<p>Plays the video when the player is loaded</p>
-			</header>
+		<div class="players">
+			<div class="player-wrapper">
+				<div class="player">
+					<div id="dailymotion"></div>
+				</div>
+			</div>
 
-			<div id="first-example"></div>
-			<pre class="code"></pre>
+			<div class="player-wrapper">
+				<div class="player">
+					<div id="vimeo"></div>
+				</div>
+			</div>
 
-			<script class="source">
-				var multiplayer = require( 'multiplayer' );
+			<div class="player-wrapper">
+				<div class="player">
+					<div id="youtube"></div>
+				</div>
+			</div>
+		</div>
 
-				multiplayer( 'http://www.youtube.com/watch?v=gus0b8Z-Ez8', {
-					id: 'first-example',
+		<div class="controls">
+			<button data-method="play">Play</button>
+			<button data-method="pause">Pause</button>
+			<button data-method="stop">Stop</button>
+		</div>
+
+		<script class="source">
+			var multiplayer = require( 'multiplayer' );
+			var players = [ ];
+
+			var create = function( id, url ) {
+				multiplayer( url, {
+					id: id,
 					width: 800,
 					height: 600
 				}).then( function( player ) {
-					player.play( );
+					player.setVolume( 30 );
+					players.push( player );
 				}, function( error ) {
 					alert( error );
 				});
-			</script>
-		</article>
+			}
 
-		<script>
-			var sources = document.getElementsByClassName( 'source' );
-			var source;
+			create( 'dailymotion', 'http://www.dailymotion.com/video/x19yhlp_le-joueur-le-plus-malchanceux-de-gta-v-online_videogames' );
+			create( 'vimeo', 'http://vimeo.com/68787849' );
+			create( 'youtube', 'http://www.youtube.com/watch?v=gus0b8Z-Ez8' );
 
-			for ( var i in sources ) {
-				source = sources[ i ];
-				source.previousElementSibling.innerHTML = source.innerHTML;
+			var buttons = document.getElementsByTagName( 'button' );
+
+			for ( var i = 0, l = buttons.length; i < l; ++i ) {
+				buttons[ i ].onclick = function( e ) {
+					for ( var j in players ) {
+						players[ j ][ e.target.getAttribute( 'data-method' )]( );
+					}
+				}
 			}
 		</script>
 	</body>
